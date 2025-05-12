@@ -25,5 +25,9 @@ public class Principal {
                 exchangeRate.getConversionRate(),
                 exchangeRate.getTargetCode());
 
+        //Una vez que se obtiene la respuesta JSON se convierte a un objeto ExchangeRateResponse
+        // Crear instancia de la clase de conversión
+        CurrencyConverter converter = new CurrencyConverter();
+        converter.convertCurrency(exchangeRate);
     }
 }
