@@ -2,32 +2,71 @@ package com.rodstone.conversordemonedas;
 
 import com.google.gson.Gson;
 import com.rodstone.conversordemonedas.modelos.ExchangeRateResponse;
-
 import java.net.http.HttpRequest;
+import java.util.Scanner;
 
 public class Principal {
     public static void main(String[] args) {
-        System.out.println("Conversor de Monedas iniciado");
-
-        //construye una solicitud, al ejecutar esa solicitud con el HttpClient
-        //obtiene la respuesta desde la API.
+        Scanner scanner = new Scanner(System.in);
         ApiClient apiClient = new ApiClient();
-        HttpRequest request = apiClient.createRequest("USD", "MXN");
-        String jsonResponse = apiClient.sendRequest(request);
-        System.out.println(jsonResponse);
-
-        //Analizando la respuesta de la API
         Gson gson = new Gson();
-        ExchangeRateResponse exchangeRate = gson.fromJson(jsonResponse, ExchangeRateResponse.class);
-
-        System.out.printf("1 %s equivale a %.2f %s\n",
-                exchangeRate.getBaseCode(),
-                exchangeRate.getConversionRate(),
-                exchangeRate.getTargetCode());
-
-        //Una vez que se obtiene la respuesta JSON se convierte a un objeto ExchangeRateResponse
-        // Crear instancia de la clase de conversión
         CurrencyConverter converter = new CurrencyConverter();
-        converter.convertCurrency(exchangeRate);
+
+        boolean continuar = true;
+
+        //Implementa un menú interactivo en consola donde el usuario pueda elegir
+        // qué conversión desea realizar (ej. de USD a MXN, de MXN a USD, etc.),
+        //o salir del programa.
+        while(continuar){
+            System.out.println("\n==== Conversor de Monedas ====");
+            System.out.println("1. USD a MXN");
+            System.out.println("2. MXN a USD");
+            System.out.println("3. USD a EUR");
+            System.out.println("4. EUR a USD");
+            System.out.println("5. Salir");
+            System.out.print("Selecciona una opcion:");
+            int opcion = Integer.parseInt(scanner.nextLine());
+
+            if(opcion == 5){
+                continuar = false;
+                System.out.println("Fin del programa...Hasta luego!");
+                continue;
+            }
+
+            String base = "";
+            String destino = "";
+
+            switch(opcion){
+                case 1->{
+                    base    = "USD";
+                    destino = "MXN";
+                }
+                case 2->{
+                    base    = "MXN";
+                    destino = "USD";
+                }
+                case 3->{
+                    base    = "USD";
+                    destino = "EUR";
+                }case 4->{
+                    base    = "EUR";
+                    destino = "USD";
+                }
+                default -> {
+                    System.out.println("Opcion Invalida");
+                    continue;
+                }
+            }
+
+            try{
+                HttpRequest request = apiClient.createRequest(base,destino);
+                String jsonResponse = apiClient.sendRequest(request);
+                ExchangeRateResponse exchangeRate = gson.fromJson(jsonResponse, ExchangeRateResponse.class);
+                converter.convertCurrency(exchangeRate);
+            } catch (Exception e) {
+                System.out.println("Ocurrio un error al procesar la solicitud: " + e.getMessage());
+            }
+        }
+        scanner.close();
     }
 }
