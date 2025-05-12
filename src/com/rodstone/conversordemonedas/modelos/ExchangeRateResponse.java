@@ -13,15 +13,15 @@ public class ExchangeRateResponse {
         return result;
     }
 
-    public String getBase_code() {
+    public String getBaseCode() {
         return base_code;
     }
 
-    public String getTarget_code() {
+    public String getTargetCode() {
         return target_code;
     }
 
-    public double getConversion_rate() {
+    public double getConversionRate() {
         return conversion_rate;
     }
 }

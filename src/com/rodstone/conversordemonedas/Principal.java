@@ -1,5 +1,8 @@
 package com.rodstone.conversordemonedas;
 
+import com.google.gson.Gson;
+import com.rodstone.conversordemonedas.modelos.ExchangeRateResponse;
+
 import java.net.http.HttpRequest;
 
 public class Principal {
@@ -12,5 +15,15 @@ public class Principal {
         HttpRequest request = apiClient.createRequest("USD", "MXN");
         String jsonResponse = apiClient.sendRequest(request);
         System.out.println(jsonResponse);
+
+        //Analizando la respuesta de la API
+        Gson gson = new Gson();
+        ExchangeRateResponse exchangeRate = gson.fromJson(jsonResponse, ExchangeRateResponse.class);
+
+        System.out.printf("1 %s equivale a %.2f %s\n",
+                exchangeRate.getBaseCode(),
+                exchangeRate.getConversionRate(),
+                exchangeRate.getTargetCode());
+
     }
 }
