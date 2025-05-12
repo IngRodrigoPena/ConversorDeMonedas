@@ -1,7 +1,9 @@
 package com.rodstone.conversordemonedas;
+import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.URI;
 import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
 
 //La clase ApiClient encapsula el cliente HTTP (HttpClient)
@@ -44,6 +46,26 @@ public class ApiClient {
                               .uri(URI.create(uri))
                               .GET()
                               .build();
-       }
+        }
+
+        //Construir la Respuesta (HttpResponse)
+        //el metodo sendRequest() puede construir una solicitud,
+        //al ejecutar esa solicitud con el HttpClient
+        //se obtiene la respuesta desde la API.
+
+        //client.send(...): envía la solicitud y espera la respuesta.
+        //HttpResponse.BodyHandlers.ofString(): indica que queremos el cuerpo de la respuesta como un texto (String).
+        //response.body(): devuelve el contenido de la respuesta en formato JSON (en texto).
+        //Se maneja cualquier error con try-catch para que el programa no falle de inmediato si algo sale mal.
+        public String sendRequest(HttpRequest request) {
+            try {
+                 HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+                 return response.body();  // El cuerpo de la respuesta JSON como String
+            } catch (IOException | InterruptedException e) {
+                 System.out.println("Error al enviar la solicitud: " + e.getMessage());
+                 return null;
+            }
+        }
+
 }
 
