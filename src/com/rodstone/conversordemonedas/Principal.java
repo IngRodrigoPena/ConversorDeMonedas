@@ -2,7 +2,10 @@ package com.rodstone.conversordemonedas;
 
 import com.google.gson.Gson;
 import com.rodstone.conversordemonedas.modelos.ExchangeRateResponse;
+import com.rodstone.conversordemonedas.modelos.SupportedCodesResponse;
+
 import java.net.http.HttpRequest;
+import java.util.List;
 import java.util.Scanner;
 
 public class Principal {
@@ -12,7 +15,19 @@ public class Principal {
         Gson gson = new Gson();
         CurrencyConverter converter = new CurrencyConverter();
 
-        boolean continuar = true;
+        boolean continuar = true; a
+
+        //mostrando los codigos de todas las monedas disponibles
+        HttpRequest codesRequest = apiClient.createCodesRequest();
+        String codesJson = apiClient.sendRequest(codesRequest);
+
+        SupportedCodesResponse codesResponse = gson.fromJson(codesJson, SupportedCodesResponse.class);
+
+        System.out.println("Monedas disponibles:");
+        for (List<String> codePair : codesResponse.getSupportedCodes()) {
+            System.out.printf("%s - %s\n", codePair.get(0), codePair.get(1));
+        }
+
 
         //Implementa un menú interactivo en consola donde el usuario pueda elegir
         // qué conversión desea realizar (ej. de USD a MXN, de MXN a USD, etc.),

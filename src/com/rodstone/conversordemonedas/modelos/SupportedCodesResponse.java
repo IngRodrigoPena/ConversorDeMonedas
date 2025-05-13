@@ -7,13 +7,13 @@ import java.util.List;
 //para mostrarle al usaurio un listado actualizado y dinamico
 public class SupportedCodesResponse {
     private String result;
-    private List<List<String>> suportedCodes;
+    private List<List<String>> supported_codes;
 
     public String getResult() {
         return result;
     }
 
-    public List<List<String>> getSuportedCodes() {
-        return suportedCodes;
+    public List<List<String>> getSupportedCodes() {
+        return supported_codes;
     }
 }
