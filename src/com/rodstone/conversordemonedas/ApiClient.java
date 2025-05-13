@@ -15,6 +15,7 @@ import java.net.http.HttpResponse;
 
 public class ApiClient {
         private final HttpClient client;
+        String apiKey = "59fa01b6e1764f26115f52fa";  // API_KEY
 
         // Constructor
         public ApiClient() {
@@ -38,7 +39,6 @@ public class ApiClient {
         //.build(): finaliza la construcción del objeto.
 
         public HttpRequest createRequest(String baseCode, String targetCode) {
-               String apiKey = "59fa01b6e1764f26115f52fa";  // API_KEY
                String uri = String.format("https://v6.exchangerate-api.com/v6/%s/pair/%s/%s",
                                             apiKey, baseCode, targetCode);
 
@@ -66,6 +66,16 @@ public class ApiClient {
                  return null;
             }
         }
+
+        //metodo para obtener los codigos de todas las monedas disponibles
+        public HttpRequest createCodesRequest() {
+            String url = "https://v6.exchangerate-api.com/v6/" + apiKey + "/codes";
+            return HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .GET()
+                    .build();
+        }
+
 
 }
 
