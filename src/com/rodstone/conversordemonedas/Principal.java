@@ -23,10 +23,26 @@ public class Principal {
             String codesJson  = apiClient.sendRequest(codesRequest);
             SupportedCodesResponse codesResponse = gson.fromJson(codesJson, SupportedCodesResponse.class);
 
+            //Mostrar en columnas
+            List<List<String>> codes = codesResponse.getSupportedCodes();
+            int columnas =3;
             System.out.println("=== Monedas Disponibles ===");
-            for(List<String> codePair : codesResponse.getSupportedCodes()){
-                System.out.printf("%s - %s\n",codePair.get(0),codePair.get(1));
+            for(int i =0;i<codes.size();i++){
+                List<String> codePair = codes.get(i);
+                System.out.printf("%-7s - %-25s", codePair.get(0),codePair.get(1));
+                if((i+1) %columnas == 0){
+                    System.out.println();
+                }
             }
+            System.out.println("\nTambién puedes consultar la lista completa aquí:");
+            System.out.println("https://www.exchangerate-api.com/docs/supported-currencies");
+
+
+
+//            System.out.println("=== Monedas Disponibles ===");
+//            for(List<String> codePair : codesResponse.getSupportedCodes()){
+//                System.out.printf("%s - %s\n",codePair.get(0),codePair.get(1));
+//            }
         }catch (Exception e){
             System.out.println("Error al obtener las monedas: " + e.getMessage());
             return;
@@ -35,6 +51,9 @@ public class Principal {
         boolean continuar = true;
         while (continuar) {
             try {
+                System.out.println("Bienvenido al conversor de monedas. " +
+                        "\nSolo necesitas ingresar la moneda que tienes, " +
+                        "\nla moneda a la que quieres convertir y el monto.");
                 System.out.print("\nIngresa la moneda base (por ejemplo, USD:");
                 String baseCode = scanner.nextLine().toUpperCase();
 
