@@ -5,7 +5,11 @@ import com.rodstone.conversordemonedas.modelos.ConversionResponse;
 import com.rodstone.conversordemonedas.modelos.SupportedCodesResponse;
 import java.net.http.HttpRequest;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.Scanner;
+
+import static com.rodstone.conversordemonedas.util.ValidadorMoneda.esCodigoValido;
 
 //Se reemplaza el menú de opciones fijas por una versión más flexible,
 //donde el usuario pueda ingresar los códigos de las monedas que desea convertir
@@ -16,6 +20,7 @@ public class Principal {
         ApiClient apiClient = new ApiClient();
         Gson gson = new Gson();
         CurrencyConverter converter = new CurrencyConverter();
+        Set<String> codigosValidos = null;
 
         //Muestra las monedas disponibles
         try{
@@ -23,6 +28,14 @@ public class Principal {
             String codesJson  = apiClient.sendRequest(codesRequest);
             SupportedCodesResponse codesResponse = gson.fromJson(codesJson, SupportedCodesResponse.class);
 
+            //set de codigos validos
+            //Set<String> codigosValidos = new HashSet<>();
+            codigosValidos = new HashSet<>();
+            for (List<String> codePair : codesResponse.getSupportedCodes()) {
+                codigosValidos.add(codePair.get(0));
+            }
+
+            //aqui lo pondria si codigosvalidos esta vacia o null?
             //Mostrar en columnas
             List<List<String>> codes = codesResponse.getSupportedCodes();
             int columnas =3;
@@ -37,8 +50,6 @@ public class Principal {
             System.out.println("\nTambién puedes consultar la lista completa aquí:");
             System.out.println("https://www.exchangerate-api.com/docs/supported-currencies");
 
-
-
 //            System.out.println("=== Monedas Disponibles ===");
 //            for(List<String> codePair : codesResponse.getSupportedCodes()){
 //                System.out.printf("%s - %s\n",codePair.get(0),codePair.get(1));
@@ -48,6 +59,7 @@ public class Principal {
             return;
         }
 
+        
         boolean continuar = true;
         while (continuar) {
             try {
@@ -63,15 +75,20 @@ public class Principal {
                 System.out.print("Ingrese el importe a convertir:");
                 double amount = Double.parseDouble(scanner.nextLine());
 
-                HttpRequest conversionRequest = apiClient.createRequest(baseCode, targetCode);
-                String conversionJson = apiClient.sendRequest(conversionRequest);
+                //validando que el codigo de la moneda sea valido
+                if (!esCodigoValido(baseCode, codigosValidos) || !esCodigoValido(targetCode, codigosValidos)) {
+                    System.out.println("⚠️ Uno o ambos códigos ingresados no son válidos. Intenta de nuevo.\n");
+                } else {
+                    System.out.println("✅ Códigos válidos. Procediendo con la conversión...");
+                    HttpRequest conversionRequest = apiClient.createRequest(baseCode, targetCode);
+                    String conversionJson = apiClient.sendRequest(conversionRequest);
 
-                ConversionResponse response = gson.fromJson(conversionJson, ConversionResponse.class);
-                double tasa = response.getConversionRate();
-                double resultado = amount * tasa;
+                    ConversionResponse response = gson.fromJson(conversionJson, ConversionResponse.class);
+                    double tasa = response.getConversionRate();
+                    double resultado = amount * tasa;
 
-                System.out.printf("\n%.2f %s equivalen a %.2f%s\n", amount, baseCode, resultado, targetCode);
-
+                    System.out.printf("\n%.2f %s equivalen a %.2f%s\n", amount, baseCode, resultado, targetCode);
+                }
             } catch (Exception e) {
                 System.out.println("Ocurrio un error durante la converison: " + e.getMessage());
             }
