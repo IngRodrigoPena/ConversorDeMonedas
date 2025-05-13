@@ -22,9 +22,11 @@ public class ConversionResponse {
         return result;
     }
 
-    public double getConversion_rate() {
+    public double getConversionRate() {
         return conversion_rate;
     }
+
+
 
     //setters
 }
