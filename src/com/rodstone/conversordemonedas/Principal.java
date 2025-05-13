@@ -23,6 +23,7 @@ public class Principal {
         Set<String> codigosValidos = null;
 
         //Muestra las monedas disponibles
+        System.out.println("=== Monedas Disponibles ===");
         try{
             HttpRequest codesRequest = apiClient.createCodesRequest();
             String codesJson  = apiClient.sendRequest(codesRequest);
@@ -35,11 +36,11 @@ public class Principal {
                 codigosValidos.add(codePair.get(0));
             }
 
-            //aqui lo pondria si codigosvalidos esta vacia o null?
+
             //Mostrar en columnas
             List<List<String>> codes = codesResponse.getSupportedCodes();
             int columnas =3;
-            System.out.println("=== Monedas Disponibles ===");
+            //System.out.println("=== Monedas Disponibles ===");
             for(int i =0;i<codes.size();i++){
                 List<String> codePair = codes.get(i);
                 System.out.printf("%-7s - %-25s", codePair.get(0),codePair.get(1));
@@ -59,17 +60,23 @@ public class Principal {
             return;
         }
 
-        
+        //Verificando que codigosvalidos no este vacio o null
+        // Verifica si el Set fue creado correctamente y tiene datos
+        if (codigosValidos == null || codigosValidos.isEmpty()) {
+            System.out.println("❌ No se pudieron cargar los códigos de moneda. Intenta más tarde.");
+            return; // o System.exit(1);
+        }
+
         boolean continuar = true;
         while (continuar) {
             try {
                 System.out.println("Bienvenido al conversor de monedas. " +
                         "\nSolo necesitas ingresar la moneda que tienes, " +
                         "\nla moneda a la que quieres convertir y el monto.");
-                System.out.print("\nIngresa la moneda base (por ejemplo, USD:");
+                System.out.print("\nIngresa la moneda base (por ejemplo, USD):");
                 String baseCode = scanner.nextLine().toUpperCase();
 
-                System.out.print("Ingresa la moneda destino (por ejemplo, JPY:");
+                System.out.print("Ingresa la moneda destino (por ejemplo, JPY):");
                 String targetCode = scanner.nextLine().toUpperCase();
 
                 System.out.print("Ingrese el importe a convertir:");
@@ -88,6 +95,7 @@ public class Principal {
                     double resultado = amount * tasa;
 
                     System.out.printf("\n%.2f %s equivalen a %.2f%s\n", amount, baseCode, resultado, targetCode);
+                    System.out.println();
                 }
             } catch (Exception e) {
                 System.out.println("Ocurrio un error durante la converison: " + e.getMessage());
