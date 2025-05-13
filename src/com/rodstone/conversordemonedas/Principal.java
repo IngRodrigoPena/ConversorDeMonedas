@@ -3,7 +3,6 @@ package com.rodstone.conversordemonedas;
 import com.google.gson.Gson;
 import com.rodstone.conversordemonedas.modelos.ConversionResponse;
 import com.rodstone.conversordemonedas.modelos.SupportedCodesResponse;
-
 import java.net.http.HttpRequest;
 import java.util.List;
 import java.util.Scanner;
