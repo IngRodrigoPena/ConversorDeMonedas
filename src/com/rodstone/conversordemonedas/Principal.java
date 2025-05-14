@@ -10,10 +10,18 @@ import java.util.Set;
 public class Principal {
 
     public static void main(String[] args) {
-        ApiClient apiClient = new ApiClient();
+
+        String apiKey = "59fa01b6e1764f26115f52fa";
+        if (apiKey == null) {
+            System.err.println("❌ Falta la variable de entorno EXCHANGE_API_KEY");
+            System.exit(1);
+        }
+
+        ApiClient apiClient = new ApiClient(apiKey); // ✅ Aquí sí se pasa la clave
         Gson gson = new Gson();
+        CurrencyConversionManager conversionManager = new CurrencyConversionManager(apiClient, gson); // ✅
+
         CurrencyConverterUI ui = new CurrencyConverterUI();
-        CurrencyConversionManager manager = new CurrencyConversionManager();
         Set<String> codigosValidos = new HashSet<>();
 
         // Mostrar las monedas disponibles
