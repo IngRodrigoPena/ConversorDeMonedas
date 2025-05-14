@@ -43,6 +43,11 @@ public class InterfazUsuario {
         return respuesta.equals("s");
     }
 
+    public void mostrarEnlaceMonedas(String apiKey) {
+        String url = "https://v6.exchangerate-api.com/v6/" + apiKey + "/codes";
+        System.out.println("\n🌍 Consulta las monedas disponibles aquí: " + url + "\n");
+    }
+
     public void cerrar() {
         scanner.close();
     }

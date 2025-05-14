@@ -1,57 +1,52 @@
-// com.rodstone.conversordemonedas.Principal.java
 package com.rodstone.conversordemonedas;
 
 import com.rodstone.conversordemonedas.logica.ConversorDeMoneda;
 import com.rodstone.conversordemonedas.modelos.ConversionResponse;
 import com.rodstone.conversordemonedas.modelos.SupportedCodesResponse;
 import com.rodstone.conversordemonedas.servicio.ExchangeRateService;
-
-import java.util.Scanner;
+import com.rodstone.conversordemonedas.ui.InterfazUsuario;
 
 public class Principal {
     public static void main(String[] args) {
-        //String apiKey = "TU_API_KEY"; // Reemplaza con tu API key real
+        //String apiKey = "TU_API_KEY"; // Reemplaza por tu clave real
         String apiKey = "59fa01b6e1764f26115f52fa";
-
-        Scanner scanner = new Scanner(System.in);
-
         ExchangeRateService servicio = new ExchangeRateService(apiKey);
         ConversorDeMoneda conversor = new ConversorDeMoneda();
+        InterfazUsuario ui = new InterfazUsuario();
 
         SupportedCodesResponse codigos = servicio.obtenerCodigosSoportados();
         if (codigos == null || !"success".equalsIgnoreCase(codigos.getResult())) {
-            System.out.println("No se pudieron obtener los códigos de monedas.");
+            ui.mostrarError("No se pudieron obtener los códigos de monedas.");
             return;
         }
+        //mostrar monedas disponibles en la API
+        ui.mostrarEnlaceMonedas(apiKey);
 
-        System.out.println("Conversor de Monedas");
-        System.out.print("Moneda base (por ejemplo, USD): ");
-        String base = scanner.nextLine().toUpperCase();
+        boolean continuar = true;
+        while (continuar) {
+            String base = ui.pedirCodigoMoneda("base");
+            String destino = ui.pedirCodigoMoneda("destino");
+            double cantidad = ui.pedirCantidad();
 
-        System.out.print("Moneda destino (por ejemplo, MXN): ");
-        String destino = scanner.nextLine().toUpperCase();
+            if (cantidad <= 0) {
+                ui.mostrarError("Cantidad inválida. Intenta de nuevo.");
+                continue;
+            }
 
-        System.out.print("Cantidad a convertir: ");
-        double cantidad;
+            ConversionResponse conversion = servicio.obtenerConversion(base, destino);
+            if (conversion == null || !"success".equalsIgnoreCase(conversion.getResult())) {
+                ui.mostrarError("No se pudo obtener la tasa de conversión.");
+                continue;
+            }
 
+            double resultado = conversor.convertir(cantidad, conversion);
+            ui.mostrarResultado(cantidad, base, resultado, destino, conversion.getConversionRate());
 
-
-        try {
-            cantidad = Double.parseDouble(scanner.nextLine());
-        } catch (NumberFormatException e) {
-            System.out.println("Cantidad inválida.");
-            return;
+            continuar = ui.preguntarOtraConversion();
         }
 
-        ConversionResponse conversion = servicio.obtenerConversion(base, destino);
-        if (conversion == null || !"success".equalsIgnoreCase(conversion.getResult())) {
-            System.out.println("No se pudo obtener la tasa de conversión.");
-            return;
-        }
-
-        double resultado = conversor.convertir(cantidad, conversion);
-        System.out.printf("%.2f %s equivalen a %.2f %s (Tasa: %.4f)\n",
-                cantidad, base, resultado, destino, conversion.getConversionRate());
+        ui.mostrarMensaje("Gracias por usar el conversor de monedas.");
+        ui.cerrar();
     }
 }
 
