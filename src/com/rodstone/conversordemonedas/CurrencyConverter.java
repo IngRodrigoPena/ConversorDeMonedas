@@ -1,18 +1,37 @@
 package com.rodstone.conversordemonedas;
 import com.rodstone.conversordemonedas.modelos.ExchangeRateResponse;
+
 import java.util.Scanner;
 
 public class CurrencyConverter {
 
-    //Ahora que ya puede obtener la tasa de cambio (conversion_rate),
-    //este metodo permite al usuario ingresar una cantidad,
-    //y calcular el valor convertido usando esa tasa.
-    public void convertCurrency(ExchangeRateResponse exchangeRate) {
-        Scanner scanner = new Scanner(System.in);
-        System.out.printf("Ingresa la cantidad en %s que deseas convertir: ", exchangeRate.getBaseCode());
-        double cantidad = Double.parseDouble(scanner.nextLine());
-        double resultado = cantidad * exchangeRate.getConversionRate();
+    // Método para convertir divisas recibiendo una cantidad como parámetro
+    public double convertCurrency(double amount, ExchangeRateResponse exchangeRate) {
+        return amount * exchangeRate.getConversionRate();
+    }
 
+    // Método para interactuar con el usuario y hacer la conversión
+    public void startConversion(ExchangeRateResponse exchangeRate) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.printf("Ingresa la cantidad en %s que deseas convertir: ", exchangeRate.getBaseCode());
+
+        // Manejo de posibles errores de entrada
+        double cantidad = 0;
+        boolean validInput = false;
+        while (!validInput) {
+            try {
+                cantidad = Double.parseDouble(scanner.nextLine());
+                validInput = true;
+            } catch (NumberFormatException e) {
+                System.out.println("Por favor, ingresa un número válido.");
+            }
+        }
+
+        // Realizar la conversión
+        double resultado = convertCurrency(cantidad, exchangeRate);
+
+        // Mostrar el resultado
         System.out.printf("%.2f %s equivalen a %.2f %s\n",
                 cantidad,
                 exchangeRate.getBaseCode(),
@@ -20,3 +39,4 @@ public class CurrencyConverter {
                 exchangeRate.getTargetCode());
     }
 }
+
