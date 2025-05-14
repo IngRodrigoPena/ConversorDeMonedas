@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Scanner;
 
-import static com.rodstone.conversordemonedas.util.ValidadorMoneda.esCodigoValido;
+//import static com.rodstone.conversordemonedas.util.ValidadorMoneda.esCodigoValido;
 
 //Se reemplaza el menú de opciones fijas por una versión más flexible,
 //donde el usuario pueda ingresar los códigos de las monedas que desea convertir
