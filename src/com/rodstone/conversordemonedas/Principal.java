@@ -11,7 +11,7 @@ import java.util.Scanner;
 public class Principal {
     public static void main(String[] args) {
         //String apiKey = "TU_API_KEY"; // Reemplaza con tu API key real
-        String apiKey = "59fa01b6e1764f26115f52fa"; 
+        String apiKey = "59fa01b6e1764f26115f52fa";
 
         Scanner scanner = new Scanner(System.in);
 
