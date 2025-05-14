@@ -4,8 +4,15 @@ import java.util.Set;
 
 public class ValidadorMoneda {
 
-    //Valida se el codigo proporcionado es valido
-    public static boolean esCodigoValido(String codigo, Set<String> codigosValidos) {
+    private Set<String> codigosValidos;
+
+    // Constructor para inyectar los códigos válidos
+    public ValidadorMoneda(Set<String> codigosValidos) {
+        this.codigosValidos = codigosValidos;
+    }
+
+    // Método para validar si el código es válido
+    public boolean esCodigoValido(String codigo) {
         return codigosValidos.contains(codigo.toUpperCase());
     }
 }
