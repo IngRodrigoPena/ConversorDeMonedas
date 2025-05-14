@@ -1,81 +1,59 @@
+// com.rodstone.conversordemonedas.Principal.java
 package com.rodstone.conversordemonedas;
 
+import com.rodstone.conversordemonedas.logica.ConversorDeMoneda;
+import com.rodstone.conversordemonedas.modelos.ConversionResponse;
 import com.rodstone.conversordemonedas.modelos.SupportedCodesResponse;
-import com.google.gson.Gson;
-import java.net.http.HttpRequest;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import com.rodstone.conversordemonedas.servicio.ExchangeRateService;
+
+import java.util.Scanner;
 
 public class Principal {
-
     public static void main(String[] args) {
+        //String apiKey = "TU_API_KEY"; // Reemplaza con tu API key real
+        String apiKey = "59fa01b6e1764f26115f52fa"; 
 
-        String apiKey = "59fa01b6e1764f26115f52fa";
-        if (apiKey == null) {
-            System.err.println("❌ Falta la variable de entorno EXCHANGE_API_KEY");
-            System.exit(1);
-        }
+        Scanner scanner = new Scanner(System.in);
 
-        ApiClient apiClient = new ApiClient(apiKey); // ✅ Aquí sí se pasa la clave
-        Gson gson = new Gson();
-        CurrencyConversionManager conversionManager = new CurrencyConversionManager(apiClient, gson); // ✅
+        ExchangeRateService servicio = new ExchangeRateService(apiKey);
+        ConversorDeMoneda conversor = new ConversorDeMoneda();
 
-        CurrencyConverterUI ui = new CurrencyConverterUI();
-        Set<String> codigosValidos = new HashSet<>();
-
-        // Mostrar las monedas disponibles
-        ui.mostrarMensaje("=== Monedas Disponibles ===");
-        try {
-            HttpRequest codesRequest = apiClient.createCodesRequest();
-            String codesJson = apiClient.sendRequest(codesRequest);
-            SupportedCodesResponse codesResponse = gson.fromJson(codesJson, SupportedCodesResponse.class);
-
-            for (List<String> codePair : codesResponse.getSupportedCodes()) {
-                codigosValidos.add(codePair.get(0));
-            }
-
-            // Mostrar las monedas disponibles
-            for (int i = 0; i < codesResponse.getSupportedCodes().size(); i++) {
-                List<String> codePair = codesResponse.getSupportedCodes().get(i);
-                System.out.printf("%-7s - %-25s", codePair.get(0), codePair.get(1));
-                if ((i + 1) % 3 == 0) {
-                    System.out.println();
-                }
-            }
-
-        } catch (Exception e) {
-            ui.mostrarMensaje("Error al obtener las monedas: " + e.getMessage());
+        SupportedCodesResponse codigos = servicio.obtenerCodigosSoportados();
+        if (codigos == null || !"success".equalsIgnoreCase(codigos.getResult())) {
+            System.out.println("No se pudieron obtener los códigos de monedas.");
             return;
         }
 
-        boolean continuar = true;
-        while (continuar) {
-            try {
-                // Obtener entrada del usuario
-                String baseCode = ui.obtenerCodigoMoneda("base");
-                String targetCode = ui.obtenerCodigoMoneda("destino");
-                double amount = ui.obtenerCantidad();
+        System.out.println("Conversor de Monedas");
+        System.out.print("Moneda base (por ejemplo, USD): ");
+        String base = scanner.nextLine().toUpperCase();
 
-                // Validar códigos
-                if (!CurrencyValidator.esCodigoValido(baseCode, codigosValidos) || !CurrencyValidator.esCodigoValido(targetCode, codigosValidos)) {
-                    ui.mostrarMensaje("⚠️ Uno o ambos códigos ingresados no son válidos. Intenta de nuevo.");
-                } else {
-                    // Realizar la conversión
-                    double resultado = manager.realizarConversion(baseCode, targetCode, amount);
-                    ui.mostrarMensaje(String.format("%.2f %s equivalen a %.2f %s", amount, baseCode, resultado, targetCode));
-                }
-            } catch (Exception e) {
-                ui.mostrarMensaje("Ocurrió un error durante la conversión: " + e.getMessage());
-            }
+        System.out.print("Moneda destino (por ejemplo, MXN): ");
+        String destino = scanner.nextLine().toUpperCase();
 
-            // Preguntar si desea continuar
-            continuar = ui.deseaContinuar();
+        System.out.print("Cantidad a convertir: ");
+        double cantidad;
+
+
+
+        try {
+            cantidad = Double.parseDouble(scanner.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Cantidad inválida.");
+            return;
         }
 
-        ui.mostrarMensaje("\nGracias por usar el conversor de monedas.");
-        ui.cerrarScanner();
+        ConversionResponse conversion = servicio.obtenerConversion(base, destino);
+        if (conversion == null || !"success".equalsIgnoreCase(conversion.getResult())) {
+            System.out.println("No se pudo obtener la tasa de conversión.");
+            return;
+        }
+
+        double resultado = conversor.convertir(cantidad, conversion);
+        System.out.printf("%.2f %s equivalen a %.2f %s (Tasa: %.4f)\n",
+                cantidad, base, resultado, destino, conversion.getConversionRate());
     }
 }
+
 
 
